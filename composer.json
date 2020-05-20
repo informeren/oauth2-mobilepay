@@ -37,8 +37,9 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
         "analyze": "phpstan analyze --level 5 src",
-        "check": "phpcs --standard=psr1 -sp src && phpcs --standard=psr12 -sp src"
+        "check": "phpcs --standard=psr1 -sp src && phpcs --standard=psr12 -sp src",
+        "coverage": "phpunit --coverage-text",
+        "test": "phpunit"
     }
 }
