@@ -8,6 +8,14 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+before_install:
+  - phpenv config-rm xdebug.ini
+  - phpenv rehash
+  - composer validate
+
+install:
+  - composer install --no-interaction
+
 stages:
   - analyze
   - test
@@ -19,11 +27,6 @@ jobs:
       script: composer run analyze
     - name: "Code style"
       script: composer run check
-
-before_script:
-  - phpenv config-rm xdebug.ini
-  - composer install --no-interaction
-  - phpenv rehash
 
 script:
   - composer run test
