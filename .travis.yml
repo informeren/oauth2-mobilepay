@@ -13,3 +13,4 @@ install:
 script:
   - composer run analyze
   - composer run check
+  - composer run test
