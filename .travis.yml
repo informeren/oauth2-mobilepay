@@ -1,11 +1,8 @@
 language: php
 
 php:
-  - 7.3
   - 7.4
-
-install:
-  - composer install --no-interaction
+  - 7.3
 
 stages:
   - analyze
@@ -18,6 +15,11 @@ jobs:
       script: composer run analyze
     - name: "Code style"
       script: composer run check
+
+before_script:
+  - phpenv config-rm xdebug.ini
+  - composer install --no-interaction
+  - phpenv rehash
 
 script:
   - composer run test
