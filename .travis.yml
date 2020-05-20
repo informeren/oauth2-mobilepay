@@ -10,15 +10,6 @@ before_install:
 install:
   - composer install --prefer-source --no-interaction --dev
 
-stages:
-  - analyze
-
-jobs:
-  include:
-    - stage: analyze
-      name: phpstan
-      script:
-        - composer run analyze
-    - script:
-        - composer run check
-      name: phpcs
+script:
+  - composer run analyze
+  - composer run check
