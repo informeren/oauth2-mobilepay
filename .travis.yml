@@ -1,0 +1,24 @@
+language: php
+
+php:
+  - 7.3
+  - 7.4
+
+before_install:
+  - composer self-update
+
+install:
+  - composer install --prefer-source --no-interaction --dev
+
+stages:
+  - analyze
+
+jobs:
+  include:
+    - stage: analyze
+      name: phpstan
+      script:
+        - composer run analyze
+    - script:
+        - composer run check
+      name: phpcs
