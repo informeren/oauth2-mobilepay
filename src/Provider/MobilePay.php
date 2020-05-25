@@ -21,21 +21,33 @@ class MobilePay extends AbstractProvider
      */
     protected $merchantVat;
 
+    /**
+     * {@inheritDoc}
+     */
     public function getBaseAuthorizationUrl()
     {
         return 'https://sandprod-admin.mobilepay.dk/account/connect/authorize';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getBaseAccessTokenUrl(array $params)
     {
         return 'https://api.sandbox.mobilepay.dk/merchant-authentication-openidconnect/connect/token';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
-        return 'https://api.sandbox.mobilepay.dk/subscriptions/api/merchants/me';
+        throw new \RuntimeException('Not implemented');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getAccessToken($grant, array $options = [])
     {
         $options['code_verifier'] = $this->codeVerifier;
@@ -43,6 +55,9 @@ class MobilePay extends AbstractProvider
         return parent::getAccessToken($grant, $options);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getAuthorizationParameters(array $options)
     {
         $options['approval_prompt'] = null;
@@ -66,6 +81,9 @@ class MobilePay extends AbstractProvider
         return rtrim(strtr($encoded, '/+', '_-'), '=');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function checkResponse(ResponseInterface $response, $data)
     {
         if (empty($data['error'])) {
@@ -77,6 +95,9 @@ class MobilePay extends AbstractProvider
         throw new IdentityProviderException($data['error'], $code, $data);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function fetchResourceOwnerDetails(AccessToken $token)
     {
         $parser = new Parser();
@@ -91,16 +112,25 @@ class MobilePay extends AbstractProvider
         }, []);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function createResourceOwner(array $response, AccessToken $token)
     {
         return new MobilePayResourceOwner($response);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getDefaultScopes()
     {
         return [];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getScopeSeparator()
     {
         return ' ';
