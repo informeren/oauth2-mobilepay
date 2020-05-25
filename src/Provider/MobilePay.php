@@ -14,7 +14,7 @@ use Throwable;
 
 class MobilePay extends AbstractProvider
 {
-    const ENDPOINTS = [
+    protected const ENDPOINTS = [
         'dk' => [
             'production' => 'https://admin.mobilepay.dk/account/.well-known/openid-configuration',
             'sandbox' => 'https://sandprod-admin.mobilepay.dk/account/.well-known/openid-configuration',
