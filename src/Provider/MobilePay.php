@@ -196,13 +196,10 @@ class MobilePay extends AbstractProvider
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        if (empty($data['error'])) {
-            return;
+        if ($response->getStatusCode() !== 200 || empty($data['access_token'])) {
+            $message = 'Invalid token';
+            throw new IdentityProviderException($message, 0, $data);
         }
-
-        $code = 0;
-
-        throw new IdentityProviderException($data['error'], $code, $data);
     }
 
     /**
