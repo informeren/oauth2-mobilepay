@@ -19,11 +19,17 @@ class MobilePayResourceOwner implements ResourceOwnerInterface
         $this->response = $response;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getId()
     {
         return $this->response['merchant_id'];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function toArray()
     {
         return $this->response;
