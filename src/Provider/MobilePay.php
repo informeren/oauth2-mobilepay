@@ -2,8 +2,11 @@
 
 namespace Informeren\OAuth2\Client\Provider;
 
+use Informeren\OAuth2\Client\JWK\KeySet;
 use InvalidArgumentException;
 use Lcobucci\JWT\Claim;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\ValidationData;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
@@ -197,9 +200,36 @@ class MobilePay extends AbstractProvider
     protected function checkResponse(ResponseInterface $response, $data)
     {
         if ($response->getStatusCode() !== 200 || empty($data['access_token'])) {
-            $message = 'Invalid token';
-            throw new IdentityProviderException($message, 0, $data);
+            throw new IdentityProviderException('Invalid reponse', 0, $data);
         }
+
+        $parser = new Parser();
+
+        $token = $parser->parse($data['id_token']);
+
+        $validator = new ValidationData();
+        $validator->setIssuer($this->configuration['issuer']);
+        $validator->setAudience($this->clientId);
+
+        if (!$token->validate($validator)) {
+            throw new IdentityProviderException('Invalid token', 0, $data);
+        }
+
+        if ($token->hasHeader('kid')) {
+            $request = $this->getRequest('GET', $this->configuration['jwks_uri']);
+            $response = $this->getResponse($request);
+
+            $keyset = KeySet::fromJson($response->getBody());
+
+            $key = $keyset->find($token->getHeader('kid'));
+
+            $signer = new Sha256();
+            if ($token->verify($signer, $key->toPem())) {
+                return;
+            }
+        }
+
+        throw new IdentityProviderException('Unable to verify token signature', 0, $data);
     }
 
     /**
