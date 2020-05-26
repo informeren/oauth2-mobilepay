@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+use Informeren\OAuth2\Client\Provider\MobilePay;
+
+require './vendor/autoload.php';
+
+$provider = new MobilePay([
+    'clientId' => getenv('CLIENT_ID'),
+    'clientSecret' => getenv('CLIENT_SECRET'),
+    'codeVerifier' => getenv('CODE_VERIFIER'),
+    'merchantVat' => getenv('MERCHANT_VAT'),
+    'redirectUri' => getenv('REDIRECT_URI'),
+]);
+
+$url = $provider->getAuthorizationUrl([
+    'scope' => ['openid', 'subscriptions', 'offline_access'],
+    'response_type' => 'code id_token',
+    'response_mode' => 'fragment',
+]);
+
+print "Authorization URL: $url\n";
+
+$command = sprintf('/usr/bin/open "%s"', $url);
+
+exec($command);
