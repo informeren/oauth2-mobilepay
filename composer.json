@@ -39,7 +39,7 @@
         }
     },
     "scripts": {
-        "analyze": "phpstan analyze --level 5 src",
+        "analyze": "phpstan analyze --level 5 bin/* src",
         "check": "phpcs --standard=psr1 -sp src && phpcs --standard=psr12 -sp src",
         "coverage": "phpunit --coverage-text",
         "test": "phpunit"
