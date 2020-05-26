@@ -1,4 +1,5 @@
 .DS_Store
+.envrc
 .idea/
 composer.lock
 notes.txt
