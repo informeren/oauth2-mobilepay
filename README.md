@@ -39,6 +39,11 @@ $provider = new MobilePay([
 
 The `clientId` and `clientSecret` values are provided by MobilePay. The rest of the values are provided by you. After the first request, you must use the same `codeVerifier` value for all subsequent authorization requests, so store it in a safe place.
 
+The following additional options are available:
+
+- `country`: Either `dk` or `fi`. Defaults to `da`.
+- `environment`: Either `production` or `sandbox`. Defaults to `sandbox`.
+
 ### Create authorization URL
 
 ```php
