@@ -25,6 +25,48 @@ To install, use composer:
 composer require informeren/oauth2-mobilepay
 ```
 
+## Tutorial
+
+```php
+$provider = new MobilePay([
+    'clientId' => 'examplecompany',
+    'clientSecret' => 'yxWIQHKjeEXW1ayL7kV77mh9YInAZNmSjJGuOrG69GE',
+    'redirectUri' => 'https://www.example.com/redirect',
+    'codeVerifier' => 'MVLkNAsW0uy5PnH3L3YwUzXqcPzMfNeKPIfD4K32MN4',
+    'merchantVat' => 'DK12345678',
+]);
+```
+
+The `clientId` and `clientSecret` values are provided by MobilePay. The rest of the values are provided by you. After the first request, you must use the same `codeVerifier` value for all subsequent authorization requests, so store it in a safe place.
+
+### Create authorization URL
+
+```php
+$url = $provider->getAuthorizationUrl([
+    'scope' => ['openid', 'subscriptions', 'offline_access'],
+    'response_type' => 'code id_token',
+    'response_mode' => 'fragment',
+]);
+```
+
+Open the resulting URL in a browser and accept the request. You will be redirected to the `redirectUri` and the authorization code will be available in the `code` URL parameter.
+
+### Use code to get access token
+
+```php
+$token = $provider->getAccessToken('authorization_code', [
+    'code' => 'gDnCpS1n2tUB4D428D2v4Daw77mKm66N2xekzEBSmKzeDspdUfrNnCTFWuZ2Ly9F',
+]);
+```
+
+### Refresh access token
+
+```php
+$token = $provider->getAccessToken('refresh_token', [
+    'refresh_token' => 'NDAwxVTnsE5KlHf4ganujXfG3EAAJkj0DquVuxXxZk6c4G1G0tIX8vQ40Jzxaq0j',
+]);
+```
+
 ## Testing
 
 Tests can be run with:
