@@ -14,6 +14,7 @@ $jwks_uri = $argv[1];
 $key_id = $argv[2];
 
 $provider = new MobilePay([
+    'discoveryUri' => getenv('DISCOVERY_URI'),
     'clientId' => getenv('CLIENT_ID'),
     'clientSecret' => getenv('CLIENT_SECRET'),
     'codeVerifier' => getenv('CODE_VERIFIER'),

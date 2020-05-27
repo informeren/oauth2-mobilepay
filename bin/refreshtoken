@@ -12,6 +12,7 @@ if ($argc > 2) {
 $refresh_token = $argv[1];
 
 $provider = new MobilePay([
+    'discoveryUri' => getenv('DISCOVERY_URI'),
     'clientId' => getenv('CLIENT_ID'),
     'clientSecret' => getenv('CLIENT_SECRET'),
     'codeVerifier' => getenv('CODE_VERIFIER'),
