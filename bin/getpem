@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php
+
+use Informeren\OAuth2\Client\JWK\KeySet;
+use Informeren\OAuth2\Client\Provider\MobilePay;
+
+require './vendor/autoload.php';
+
+if ($argc !== 3) {
+    throw new InvalidArgumentException('Usage: getkey [jwks_uri] [key id]');
+}
+
+$jwks_uri = $argv[1];
+$key_id = $argv[2];
+
+$provider = new MobilePay([
+    'clientId' => getenv('CLIENT_ID'),
+    'clientSecret' => getenv('CLIENT_SECRET'),
+    'codeVerifier' => getenv('CODE_VERIFIER'),
+    'merchantVat' => getenv('MERCHANT_VAT'),
+    'redirectUri' => getenv('REDIRECT_URI'),
+]);
+
+try {
+    $request = $provider->getRequest('GET', $jwks_uri);
+    $response = $provider->getResponse($request);
+
+    $keyset = KeySet::fromJson($response->getBody());
+
+    $key = $keyset->find($key_id);
+
+    print $key->toPem() . "\n";
+} catch (Throwable $o_O) {
+    printf('Unable to get public key: %s', $o_O->getMessage());
+}
