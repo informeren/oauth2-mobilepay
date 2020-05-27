@@ -17,17 +17,6 @@ use Throwable;
 
 class MobilePay extends AbstractProvider
 {
-    protected const ENDPOINTS = [
-        'dk' => [
-            'production' => 'https://admin.mobilepay.dk/account/.well-known/openid-configuration',
-            'sandbox' => 'https://sandprod-admin.mobilepay.dk/account/.well-known/openid-configuration',
-        ],
-        'fi' => [
-            'production' => 'https://admin.mobilepay.fi/account/.well-known/openid-configuration',
-            'sandbox' => 'https://sandprod-admin.mobilepay.fi/account/.well-known/openid-configuration',
-        ],
-    ];
-
     /**
      * @var string
      */
@@ -48,42 +37,26 @@ class MobilePay extends AbstractProvider
      */
     public function __construct(array $options = [], array $collaborators = [])
     {
-        $options += [
-            'country' => 'dk',
-            'environment' => 'sandbox',
-        ];
-
         $this->assertRequiredOptions($options);
 
         parent::__construct($options, $collaborators);
 
-        $country = strtolower($options['country']);
-        $environment = strtolower($options['environment']);
-
-        $this->configure($country, $environment);
+        $this->configure($options['discoveryUri']);
     }
 
     /**
-     * @param string $country
-     * @param string $environment
+     * @param string $url
      */
-    protected function configure(string $country, string $environment)
+    protected function configure(string $url)
     {
-        if (empty(self::ENDPOINTS[$country][$environment])) {
-            $message = sprintf('Invalid country (%s) or environment(%s)', $country, $environment);
-            throw new RuntimeException($message);
-        }
-
-        $endpoint = self::ENDPOINTS[$country][$environment];
-
         try {
-            $request = $this->getRequest('GET', $endpoint);
+            $request = $this->getRequest('GET', $url);
             $response = $this->getResponse($request);
 
             $body = $response->getBody();
             $this->configuration = json_decode($body, true);
         } catch (Throwable $o_O) {
-            $message = sprintf('Unable to retrieve OpenID configuration from %s', $endpoint);
+            $message = sprintf('Unable to retrieve OpenID configuration from %s', $url);
             throw new RuntimeException($message);
         }
     }
@@ -109,8 +82,7 @@ class MobilePay extends AbstractProvider
             'clientId',
             'clientSecret',
             'codeVerifier',
-            'country',
-            'environment',
+            'discoveryUri',
             'merchantVat',
             'redirectUri',
         ];
