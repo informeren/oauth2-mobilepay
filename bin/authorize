@@ -6,6 +6,7 @@ use Informeren\OAuth2\Client\Provider\MobilePay;
 require './vendor/autoload.php';
 
 $provider = new MobilePay([
+    'discoveryUri' => getenv('DISCOVERY_URI'),
     'clientId' => getenv('CLIENT_ID'),
     'clientSecret' => getenv('CLIENT_SECRET'),
     'codeVerifier' => getenv('CODE_VERIFIER'),
