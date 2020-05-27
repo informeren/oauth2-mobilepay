@@ -53,7 +53,7 @@ class KeySet
         });
 
         if (count($keys) !== 1) {
-            $message = 'Key not found';
+            $message = sprintf('Key not found: %s', $id);
             throw new RuntimeException($message);
         }
 
