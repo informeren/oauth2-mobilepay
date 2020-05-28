@@ -1,18 +1,7 @@
 {
     "name": "informeren/oauth2-mobilepay",
-    "description": "MobilePay OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
     "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Morten Wulff",
-            "email": "wulff@ratatosk.net",
-            "homepage": "http://www.ratatosk.net"
-        }
-    ],
-    "config": {
-        "sort-packages": true
-    },
+    "description": "MobilePay OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
     "keywords": [
         "oauth",
         "oauth2",
@@ -21,7 +10,16 @@
         "authentication",
         "mobilepay"
     ],
-    "minimum-stability": "stable",
+    "homepage": "https://github.com/informeren/oauth2-mobilepay",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Morten Wulff",
+            "email": "wulff@ratatosk.net",
+            "homepage": "http://www.ratatosk.net",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^7.3",
         "ext-json": "*",
@@ -44,5 +42,14 @@
         "check": "phpcs --standard=psr1 -sp src && phpcs --standard=psr12 -sp src",
         "coverage": "phpunit --coverage-text",
         "test": "phpunit"
+    },
+    "scripts-descriptions": {
+        "test": "Runs the included unit tests."
+    },
+    "bin": [
+        "bin/mobilepay-auth"
+    ],
+    "config": {
+        "sort-packages": true
     }
 }
