@@ -23,6 +23,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
+        "php": "^7.3",
         "ext-json": "*",
         "lcobucci/jwt": "^3.3",
         "league/oauth2-client": "^2.0",
