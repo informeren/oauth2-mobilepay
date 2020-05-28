@@ -2,10 +2,13 @@
 
 namespace Informeren\OAuth2\Client\JWK;
 
+use Iterator;
 use RuntimeException;
 
-class KeySet
+class KeySet implements Iterator
 {
+
+    protected $position = 0;
 
     /**
      * @var Key[]
@@ -15,6 +18,7 @@ class KeySet
     public function __construct()
     {
         $this->keys = [];
+        $this->position = 0;
     }
 
     public static function fromJson(string $json): KeySet
@@ -58,5 +62,45 @@ class KeySet
         }
 
         return reset($keys);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function current()
+    {
+        return $this->keys[$this->position];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function next()
+    {
+        ++$this->position;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function key()
+    {
+        return $this->position;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function valid()
+    {
+        return isset($this->keys[$this->position]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rewind()
+    {
+        $this->position = 0;
     }
 }
