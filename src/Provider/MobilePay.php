@@ -62,7 +62,7 @@ class MobilePay extends AbstractProvider
     }
 
     /**
-     * Returns all options that are required.
+     * Returns all required options.
      *
      * @return array
      */
@@ -134,6 +134,16 @@ class MobilePay extends AbstractProvider
         return parent::getAuthorizationParameters($options);
     }
 
+    /**
+     * Compute the OpenID Connect code challenge.
+     *
+     * @see https://developer.mobilepay.dk/node/1354
+     *
+     * @param string $verifier
+     *   A cryptographically random string.
+     * @return string
+     *   A challenge derived from the verifier string.
+     */
     protected function codeChallenge(string $verifier): string
     {
         $hash = hash('sha256', $verifier, true);
