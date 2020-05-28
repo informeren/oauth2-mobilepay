@@ -17,32 +17,26 @@ The following versions of PHP are supported.
 * PHP 7.3
 * PHP 7.4
 
-## Installation
+## Install
 
-To install, use composer:
+Use composer to install the package:
 
 ```sh
-composer require informeren/oauth2-mobilepay
+$ composer require informeren/oauth2-mobilepay
 ```
 
-## Tutorial
+## Usage
 
 ```php
 $provider = new MobilePay([
     'clientId' => 'examplecompany',
     'clientSecret' => 'yxWIQHKjeEXW1ayL7kV77mh9YInAZNmSjJGuOrG69GE',
+    'discoveryUri' => 'https://www.example.com/discovery',
     'redirectUri' => 'https://www.example.com/redirect',
-    'codeVerifier' => 'MVLkNAsW0uy5PnH3L3YwUzXqcPzMfNeKPIfD4K32MN4',
-    'merchantVat' => 'DK12345678',
 ]);
 ```
 
-The `clientId` and `clientSecret` values are provided by MobilePay. The rest of the values are provided by you. After the first request, you must use the same `codeVerifier` value for all subsequent authorization requests, so store it in a safe place.
-
-The following additional options are available:
-
-- `country`: Either `dk` or `fi`. Defaults to `da`.
-- `environment`: Either `production` or `sandbox`. Defaults to `sandbox`.
+The `clientId` and `clientSecret` values are provided by MobilePay. The rest of the values are provided by you.
 
 ### Create authorization URL
 
@@ -51,16 +45,21 @@ $url = $provider->getAuthorizationUrl([
     'scope' => ['openid', 'subscriptions', 'offline_access'],
     'response_type' => 'code id_token',
     'response_mode' => 'fragment',
+    'code_verifier' => 'MVLkNAsW0uy5PnH3L3YwUzXqcPzMfNeKPIfD4K32MN4',
+    'merchant_vat' => 'DK12345678',
 ]);
 ```
 
+After the first request, you must use the same `code_verifier` value for all subsequent authorization requests, so store it in a safe place.
+
 Open the resulting URL in a browser and accept the request. You will be redirected to the `redirectUri` and the authorization code will be available in the `code` URL parameter.
 
-### Use code to get access token
+### Use authorization code to get access token
 
 ```php
 $token = $provider->getAccessToken('authorization_code', [
     'code' => 'gDnCpS1n2tUB4D428D2v4Daw77mKm66N2xekzEBSmKzeDspdUfrNnCTFWuZ2Ly9F',
+    'code_verifier' => 'MVLkNAsW0uy5PnH3L3YwUzXqcPzMfNeKPIfD4K32MN4',
 ]);
 ```
 
@@ -72,23 +71,33 @@ $token = $provider->getAccessToken('refresh_token', [
 ]);
 ```
 
+### Command-line interface
+
+The package includes a simple command-line interface to the most common operations. Run it without arguments for usage instructions.
+
+Use the following command to generate an authorization URL and open it in your default browser. 
+
+```sh
+$ ./vendor/bin/mobilepay-auth authorize | xargs open
+```
+
 ## Testing
 
 Tests can be run with:
 
 ```sh
-composer test
+$ composer test
 ```
 
 Static analysis can be run with:
 
 ```sh
-composer analyze
+$ composer analyze
 ```
 Style checks can be run with:
 
 ```sh
-composer check
+$ composer check
 ```
 
 ## License
