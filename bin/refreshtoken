@@ -3,20 +3,19 @@
 
 use Informeren\OAuth2\Client\Provider\MobilePay;
 
-require './vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-if ($argc > 2) {
-    throw new InvalidArgumentException('Usage: refreshtoken [refresh token]');
+if ($argc !== 2) {
+    print "Usage: refreshtoken [refresh token]\n";
+    exit(1);
 }
 
 $refresh_token = $argv[1];
 
 $provider = new MobilePay([
-    'discoveryUri' => getenv('DISCOVERY_URI'),
     'clientId' => getenv('CLIENT_ID'),
     'clientSecret' => getenv('CLIENT_SECRET'),
-    'codeVerifier' => getenv('CODE_VERIFIER'),
-    'merchantVat' => getenv('MERCHANT_VAT'),
+    'discoveryUri' => getenv('DISCOVERY_URI'),
     'redirectUri' => getenv('REDIRECT_URI'),
 ]);
 
@@ -25,8 +24,8 @@ try {
         'refresh_token' => $refresh_token,
     ]);
 
-    print 'Access token: ' . $token->getToken() . "\n";
-    print 'Refresh token: ' . $token->getRefreshToken() . "\n";
+    print $token->getToken() . "\n";
 } catch (Throwable $o_O) {
     print "Unable to refresh access token!\n";
+    exit(1);
 }
