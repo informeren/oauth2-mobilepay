@@ -1,0 +1,130 @@
+#!/usr/bin/env php
+<?php
+
+use Informeren\OAuth2\Client\JWK\KeySet;
+use Informeren\OAuth2\Client\Provider\MobilePay;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$script = basename(array_shift($argv));
+
+$usage = <<<EOT
+Usage:
+    $script COMMAND [ARGUMENT]
+
+Available commands:
+    authorize  Creates an authorization URL
+    access     Uses an authorization code to retrieve a access token
+    refresh    Uses a refresh token to retrieve a access token
+    pem        Retrieve JWK key(s) and output in PEM format
+EOT;
+
+if ($argc < 2) {
+    print "$usage" . PHP_EOL;
+    exit(1);
+}
+
+$required = [
+    'CLIENT_ID',
+    'CLIENT_SECRET',
+    'CODE_VERIFIER',
+    'DISCOVERY_URI',
+    'MERCHANT_VAT',
+    'REDIRECT_URI',
+];
+
+foreach ($required as $name) {
+    if (getenv($name) === false) {
+        print "Required environment variable $name not set!" . PHP_EOL;
+        exit(1);
+    }
+}
+
+$provider = new MobilePay([
+    'clientId' => getenv('CLIENT_ID'),
+    'clientSecret' => getenv('CLIENT_SECRET'),
+    'discoveryUri' => getenv('DISCOVERY_URI'),
+    'redirectUri' => getenv('REDIRECT_URI'),
+]);
+
+$commands = [
+    'authorize' => function () use ($provider) {
+        $url = $provider->getAuthorizationUrl([
+            'scope' => ['openid', 'subscriptions', 'offline_access'],
+            'response_type' => 'code id_token',
+            'response_mode' => 'fragment',
+            'code_verifier' => getenv('CODE_VERIFIER'),
+            'merchant_vat' => getenv('MERCHANT_VAT'),
+        ]);
+
+        print $url . PHP_EOL;
+    },
+    'access' => function ($argv, $argc) use ($provider, $script) {
+        if ($argc === 0) {
+            print "Usage: $script access AUTHORIZATION_CODE" . PHP_EOL;
+            exit(1);
+        }
+
+        try {
+            $token = $provider->getAccessToken('authorization_code', [
+                'code' => $argv[0],
+                'code_verifier' => getenv('CODE_VERIFIER'),
+            ]);
+
+            print 'Access token : ' . $token->getToken() . PHP_EOL;
+            print 'Refresh token: ' . $token->getRefreshToken() . PHP_EOL;
+        } catch (Throwable $o_O) {
+            print "Unable to retrieve access token!" . PHP_EOL;
+            exit(1);
+        }
+    },
+    'refresh' => function ($argv, $argc) use ($provider, $script) {
+        if ($argc === 0) {
+            print "Usage: $script refresh REFRESH_TOKEN" . PHP_EOL;
+            exit(1);
+        }
+
+        try {
+            $token = $provider->getAccessToken('refresh_token', [
+                'refresh_token' => $argv[0],
+            ]);
+
+            print $token->getToken() . PHP_EOL;
+        } catch (Throwable $o_O) {
+            print "Unable to refresh access token!" . PHP_EOL;
+            exit(1);
+        }
+    },
+    'pem' => function ($argv, $argc) use ($provider, $script) {
+        if ($argc === 0) {
+            print "Usage: $script pem JWKS_URI [KEY_ID]" . PHP_EOL;
+            exit(1);
+        }
+
+        $request = $provider->getRequest('GET', $argv[0]);
+        $response = $provider->getResponse($request);
+
+        $keyset = KeySet::fromJson($response->getBody());
+
+        if (!empty($argv[1])) {
+            $key = $keyset->find($argv[1]);
+            print $key->toPem() . PHP_EOL;
+        }
+        else {
+            foreach ($keyset as $key) {
+                print 'Key ID: ' . $key->getId() . PHP_EOL;
+                print $key->toPem() . PHP_EOL;
+            }
+        }
+    },
+];
+
+$command = array_shift($argv);
+if (!empty($commands[$command]) && is_callable($commands[$command])) {
+    call_user_func($commands[$command], $argv, count($argv));
+}
+else {
+    print "Unknown command!" . PHP_EOL;
+    print $usage . PHP_EOL;
+    exit(1);
+}
