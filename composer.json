@@ -40,7 +40,7 @@
     "scripts": {
         "analyze": "phpstan analyze --level 5 bin/* src",
         "check": "phpcs --standard=psr1 -sp src && phpcs --standard=psr12 -sp src",
-        "coverage": "phpunit --coverage-text",
+        "coverage": "phpunit --coverage-text --coverage-html ./report/",
         "test": "phpunit"
     },
     "scripts-descriptions": {
