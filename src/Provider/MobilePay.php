@@ -18,16 +18,6 @@ use Throwable;
 class MobilePay extends AbstractProvider
 {
     /**
-     * @var string
-     */
-    protected $codeVerifier;
-
-    /**
-     * @var string
-     */
-    protected $merchantVat;
-
-    /**
      * @var array
      */
     protected $configuration;
@@ -81,9 +71,7 @@ class MobilePay extends AbstractProvider
         return [
             'clientId',
             'clientSecret',
-            'codeVerifier',
             'discoveryUri',
-            'merchantVat',
             'redirectUri',
         ];
     }
@@ -133,24 +121,13 @@ class MobilePay extends AbstractProvider
     /**
      * {@inheritDoc}
      */
-    public function getAccessToken($grant, array $options = [])
-    {
-        $options['code_verifier'] = $this->codeVerifier;
-
-        return parent::getAccessToken($grant, $options);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected function getAuthorizationParameters(array $options)
     {
         $options['approval_prompt'] = null;
 
         $options['code_challenge_method'] = 'S256';
-        $options['code_challenge'] = $this->codeChallenge($this->codeVerifier);
-
-        $options['merchant_vat'] = $this->merchantVat;
+        $options['code_challenge'] = $this->codeChallenge($options['code_verifier']);
+        unset($options['code_verifier']);
 
         $options['nonce'] = $this->getRandomState();
 
