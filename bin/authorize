@@ -3,14 +3,12 @@
 
 use Informeren\OAuth2\Client\Provider\MobilePay;
 
-require './vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $provider = new MobilePay([
-    'discoveryUri' => getenv('DISCOVERY_URI'),
     'clientId' => getenv('CLIENT_ID'),
     'clientSecret' => getenv('CLIENT_SECRET'),
-    'codeVerifier' => getenv('CODE_VERIFIER'),
-    'merchantVat' => getenv('MERCHANT_VAT'),
+    'discoveryUri' => getenv('DISCOVERY_URI'),
     'redirectUri' => getenv('REDIRECT_URI'),
 ]);
 
@@ -18,6 +16,8 @@ $url = $provider->getAuthorizationUrl([
     'scope' => ['openid', 'subscriptions', 'offline_access'],
     'response_type' => 'code id_token',
     'response_mode' => 'fragment',
+    'code_verifier' => getenv('CODE_VERIFIER'),
+    'merchant_vat' => getenv('MERCHANT_VAT'),
 ]);
 
 print "Authorization URL: $url\n";

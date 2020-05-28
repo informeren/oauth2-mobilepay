@@ -3,30 +3,31 @@
 
 use Informeren\OAuth2\Client\Provider\MobilePay;
 
-require './vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-if ($argc > 2) {
-    throw new InvalidArgumentException('Usage: accesstoken [authorization code]');
+if ($argc !== 2) {
+    print "Usage: accesstoken [authorization code]\n";
+    exit(1);
 }
 
 $code = $argv[1];
 
 $provider = new MobilePay([
-    'discoveryUri' => getenv('DISCOVERY_URI'),
     'clientId' => getenv('CLIENT_ID'),
     'clientSecret' => getenv('CLIENT_SECRET'),
-    'codeVerifier' => getenv('CODE_VERIFIER'),
-    'merchantVat' => getenv('MERCHANT_VAT'),
+    'discoveryUri' => getenv('DISCOVERY_URI'),
     'redirectUri' => getenv('REDIRECT_URI'),
 ]);
 
 try {
     $token = $provider->getAccessToken('authorization_code', [
         'code' => $code,
+        'code_verifier' => getenv('CODE_VERIFIER'),
     ]);
 
     print 'Access token: ' . $token->getToken() . "\n";
     print 'Refresh token: ' . $token->getRefreshToken() . "\n";
 } catch (Throwable $o_O) {
     print "Unable to retrieve access token!\n";
+    exit(1);
 }
