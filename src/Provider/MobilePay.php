@@ -2,8 +2,10 @@
 
 namespace Informeren\OAuth2\Client\Provider;
 
-use Informeren\OAuth2\Client\JWK\KeySet;
+use Base64Url\Base64Url;
 use InvalidArgumentException;
+use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Lcobucci\JWT\Claim;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\ValidationData;
@@ -11,6 +13,8 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use Lcobucci\JWT\Parser;
+use phpseclib\Crypt\RSA;
+use phpseclib\Math\BigInteger;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Throwable;
@@ -37,7 +41,7 @@ class MobilePay extends AbstractProvider
     /**
      * @param string $url
      */
-    protected function configure(string $url)
+    private function configure(string $url)
     {
         try {
             $request = $this->getRequest('GET', $url);
@@ -62,21 +66,6 @@ class MobilePay extends AbstractProvider
     }
 
     /**
-     * Returns all required options.
-     *
-     * @return array
-     */
-    protected function getRequiredOptions()
-    {
-        return [
-            'clientId',
-            'clientSecret',
-            'discoveryUri',
-            'redirectUri',
-        ];
-    }
-
-    /**
      * Verifies that all required options have been passed.
      *
      * @param  array $options
@@ -92,6 +81,21 @@ class MobilePay extends AbstractProvider
                 'Required options not defined: ' . implode(', ', array_keys($missing))
             );
         }
+    }
+
+    /**
+     * Returns all required options.
+     *
+     * @return array
+     */
+    private function getRequiredOptions()
+    {
+        return [
+            'clientId',
+            'clientSecret',
+            'discoveryUri',
+            'redirectUri',
+        ];
     }
 
     /**
@@ -144,7 +148,7 @@ class MobilePay extends AbstractProvider
      * @return string
      *   A challenge derived from the verifier string.
      */
-    protected function codeChallenge(string $verifier): string
+    private function codeChallenge(string $verifier): string
     {
         $hash = hash('sha256', $verifier, true);
 
@@ -159,7 +163,7 @@ class MobilePay extends AbstractProvider
     protected function checkResponse(ResponseInterface $response, $data)
     {
         if ($response->getStatusCode() !== 200 || empty($data['access_token'])) {
-            throw new IdentityProviderException('Invalid reponse', 0, $data);
+            throw new IdentityProviderException('Invalid response', 0, $data);
         }
 
         $parser = new Parser();
@@ -178,17 +182,36 @@ class MobilePay extends AbstractProvider
             $request = $this->getRequest('GET', $this->configuration['jwks_uri']);
             $response = $this->getResponse($request);
 
-            $keyset = KeySet::fromJson($response->getBody());
+            $keyset = JWKSet::createFromJson($response->getBody());
 
-            $key = $keyset->find($token->getHeader('kid'));
+            if ($keyset->has($token->getHeader('kid'))) {
+                $key = $keyset->get($token->getHeader('kid'));
 
-            $signer = new Sha256();
-            if ($token->verify($signer, $key->toPem())) {
-                return;
+                $pem = self::keyToPem($key);
+
+                $signer = new Sha256();
+                if ($token->verify($signer, $pem)) {
+                    return;
+                }
             }
         }
 
         throw new IdentityProviderException('Unable to verify token signature', 0, $data);
+    }
+
+    private static function keyToPem(JWK $key)
+    {
+        $rsa = new RSA();
+
+        $exponent = Base64Url::decode($key->get('e'));
+        $modulus = Base64Url::decode($key->get('n'));
+
+        $rsa->loadKey([
+            'e' => new BigInteger($exponent, 256),
+            'n' => new BigInteger($modulus, 256),
+        ]);
+
+        return $rsa->getPublicKey();
     }
 
     /**
