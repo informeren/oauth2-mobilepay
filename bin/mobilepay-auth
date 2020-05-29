@@ -1,8 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-use Informeren\OAuth2\Client\JWK\KeySet;
+use Informeren\OAuth2\Client\Helper\KeyHelper;
 use Informeren\OAuth2\Client\Provider\MobilePay;
+use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -104,16 +106,25 @@ $commands = [
         $request = $provider->getRequest('GET', $argv[0]);
         $response = $provider->getResponse($request);
 
-        $keyset = KeySet::fromJson($response->getBody());
+        $keyset = JWKSet::createFromJson($response->getBody());
 
         if (!empty($argv[1])) {
-            $key = $keyset->find($argv[1]);
-            print $key->toPem() . PHP_EOL;
+            if (!$keyset->has($argv[1])) {
+                print "Key $argv[1] does not exist" . PHP_EOL;
+                exit(1);
+            }
+
+            $key = $keyset->get($argv[1]);
+            $pem = KeyHelper::keyToPem($key);
+
+            print $pem . PHP_EOL;
         }
         else {
             foreach ($keyset as $key) {
-                print 'Key ID: ' . $key->getId() . PHP_EOL;
-                print $key->toPem() . PHP_EOL;
+                /** @var JWK $key */
+                print 'Key ID: ' . $key->get('kid') . PHP_EOL;
+                $pem = KeyHelper::keyToPem($key);
+                print $pem . PHP_EOL;
             }
         }
     },
