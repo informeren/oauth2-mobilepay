@@ -3,6 +3,7 @@
 namespace Informeren\OAuth2\Client\Provider;
 
 use Base64Url\Base64Url;
+use Informeren\OAuth2\Client\Helper\KeyHelper;
 use InvalidArgumentException;
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
@@ -187,7 +188,7 @@ class MobilePay extends AbstractProvider
             if ($keyset->has($token->getHeader('kid'))) {
                 $key = $keyset->get($token->getHeader('kid'));
 
-                $pem = self::keyToPem($key);
+                $pem = KeyHelper::keyToPem($key);
 
                 $signer = new Sha256();
                 if ($token->verify($signer, $pem)) {
@@ -197,21 +198,6 @@ class MobilePay extends AbstractProvider
         }
 
         throw new IdentityProviderException('Unable to verify token signature', 0, $data);
-    }
-
-    private static function keyToPem(JWK $key)
-    {
-        $rsa = new RSA();
-
-        $exponent = Base64Url::decode($key->get('e'));
-        $modulus = Base64Url::decode($key->get('n'));
-
-        $rsa->loadKey([
-            'e' => new BigInteger($exponent, 256),
-            'n' => new BigInteger($modulus, 256),
-        ]);
-
-        return $rsa->getPublicKey();
     }
 
     /**
