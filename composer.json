@@ -51,6 +51,11 @@
     "bin": [
         "bin/mobilepay-auth"
     ],
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.0-dev"
+        }
+    },
     "config": {
         "sort-packages": true
     }
