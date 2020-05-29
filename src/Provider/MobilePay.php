@@ -2,10 +2,8 @@
 
 namespace Informeren\OAuth2\Client\Provider;
 
-use Base64Url\Base64Url;
 use Informeren\OAuth2\Client\Helper\KeyHelper;
 use InvalidArgumentException;
-use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
 use Lcobucci\JWT\Claim;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
@@ -14,8 +12,6 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use Lcobucci\JWT\Parser;
-use phpseclib\Crypt\RSA;
-use phpseclib\Math\BigInteger;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Throwable;
