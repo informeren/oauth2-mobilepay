@@ -6,9 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2020-06-02
+
+### Added
+
+- Command to generate a valid _code verifier_ string.
+
 ## [1.1.0] - 2020-05-29
 
-### Aded
+### Added
 
 - The JWT Framework.
 - Unit tests.
