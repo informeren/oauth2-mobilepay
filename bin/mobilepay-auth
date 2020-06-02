@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use Base64Url\Base64Url;
 use Informeren\OAuth2\Client\Helper\KeyHelper;
 use Informeren\OAuth2\Client\Provider\MobilePay;
 use Jose\Component\Core\JWK;
@@ -19,6 +20,7 @@ Available commands:
     access     Uses an authorization code to retrieve a access token
     refresh    Uses a refresh token to retrieve a access token
     pem        Retrieve JWK key(s) and output in PEM format
+    verifier   Creates a code verifier string
 EOT;
 
 if ($argc < 2) {
@@ -128,6 +130,17 @@ $commands = [
             }
         }
     },
+    'verifier' => function ($argv, $argc) use ($script) {
+        if ($argc > 0) {
+            print "Usage: $script verifier" . PHP_EOL;
+            exit(1);
+        }
+
+        // MobilePay recommends encoding a random 32-byte sequence to create a
+        // 43-character URL-safe string.
+        $bytes = random_bytes(32);
+        print Base64Url::encode($bytes) . PHP_EOL;
+    }
 ];
 
 $command = array_shift($argv);
