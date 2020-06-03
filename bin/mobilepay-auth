@@ -52,11 +52,24 @@ $provider = new MobilePay([
 ]);
 
 $commands = [
-    'authorize' => function () use ($provider) {
+    'authorize' => function ($argv, $argc) use ($provider, $script) {
+        if ($argc > 1) {
+            print "Usage: $script authorize [RESPONSE_MODE]" . PHP_EOL;
+            exit(1);
+        }
+
+        $modes = ['form_post', 'fragment'];
+        if (!empty($argv[0]) && in_array($argv[0], $modes)) {
+            $mode = $argv[0];
+        }
+        else {
+            $mode = 'fragment';
+        }
+
         $url = $provider->getAuthorizationUrl([
             'scope' => ['openid', 'subscriptions', 'offline_access'],
             'response_type' => 'code id_token',
-            'response_mode' => 'fragment',
+            'response_mode' => $mode,
             'code_verifier' => getenv('CODE_VERIFIER'),
             'merchant_vat' => getenv('MERCHANT_VAT'),
         ]);
