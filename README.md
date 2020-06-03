@@ -100,6 +100,12 @@ Style checks can be run with:
 $ composer check
 ```
 
+## Documentation
+
+- [MobilePay Subscriptions](https://developer.mobilepay.dk/subscriptions-main)
+- [MobilePay OpenID Connect](https://developer.mobilepay.dk/developersupport/openid/)
+- [MobilePay Subscriptions API](https://mobilepaydev.github.io/MobilePay-Subscriptions/index)
+
 ## License
 
 The MIT License (MIT). Please see [License File](https://github.com/informeren/oauth2-mobilepay/blob/master/LICENSE) for more information.
