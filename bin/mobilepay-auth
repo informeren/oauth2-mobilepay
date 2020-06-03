@@ -143,12 +143,7 @@ $commands = [
             }
         }
     },
-    'verifier' => function ($argv, $argc) use ($script) {
-        if ($argc > 0) {
-            print "Usage: $script verifier" . PHP_EOL;
-            exit(1);
-        }
-
+    'verifier' => function () {
         // MobilePay recommends encoding a random 32-byte sequence to create a
         // 43-character URL-safe string.
         $bytes = random_bytes(32);
