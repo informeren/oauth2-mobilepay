@@ -6,10 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2020-06-11
+
 ### Added
 
-- Support for different response modes
-- Links to documentation
+- Support for different response modes.
+- Links to documentation.
+- More robust autoload include.
+- Command to generate state strings.
+- More robust token validation.
 
 ## [1.2.0] - 2020-06-02
 
