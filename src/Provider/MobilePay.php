@@ -24,6 +24,11 @@ class MobilePay extends AbstractProvider
     protected $configuration;
 
     /**
+     * @var int
+     */
+    protected $timestamp;
+
+    /**
      * {@inheritDoc}
      */
     public function __construct(array $options = [], array $collaborators = [])
@@ -33,6 +38,9 @@ class MobilePay extends AbstractProvider
         parent::__construct($options, $collaborators);
 
         $this->configure($options['discoveryUri']);
+
+        // Store the time of instantiation to make NBF validation more robust.
+        $this->timestamp = time();
     }
 
     /**
@@ -167,7 +175,7 @@ class MobilePay extends AbstractProvider
 
         $token = $parser->parse($data['id_token']);
 
-        $validator = new ValidationData();
+        $validator = new ValidationData($this->timestamp);
         $validator->setIssuer($this->configuration['issuer']);
         $validator->setAudience($this->clientId);
 
