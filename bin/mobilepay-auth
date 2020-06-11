@@ -7,7 +7,24 @@ use Informeren\OAuth2\Client\Provider\MobilePay;
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
 
-require __DIR__ . '/../vendor/autoload.php';
+$paths = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+];
+
+foreach ($paths as $path) {
+    if (file_exists($path)) {
+        define('AUTOLOAD_PATH', $path);
+    }
+}
+
+if (!defined('AUTOLOAD_PATH')) {
+    print 'Unable to locate autoload.php!' . PHP_EOL;
+    exit(1);
+}
+
+/** @noinspection PhpIncludeInspection */
+require AUTOLOAD_PATH;
 
 $script = basename(array_shift($argv));
 
