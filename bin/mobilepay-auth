@@ -165,7 +165,22 @@ $commands = [
         // 43-character URL-safe string.
         $bytes = random_bytes(32);
         print Base64Url::encode($bytes) . PHP_EOL;
-    }
+    },
+    'state' => function ($argv, $argc) use ($script) {
+        if ($argc > 1) {
+            print "Usage: $script state [LENGTH]" . PHP_EOL;
+            exit(1);
+        }
+
+        $length = 32;
+        if (!empty($argv[0])) {
+            $length = $argv[0];
+        }
+
+        $state = bin2hex(random_bytes($length / 2));
+
+        print $state . PHP_EOL;
+    },
 ];
 
 $command = array_shift($argv);
