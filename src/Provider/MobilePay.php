@@ -19,6 +19,14 @@ use Throwable;
 class MobilePay extends AbstractProvider
 {
     /**
+     * The spec allows for a leeway of no more that a few minutes to allow for
+     * clock skew between the issuing server and the verifying server.
+     *
+     * @see Section 4.1 of RFC7519.
+     */
+    protected const JWT_LEEWAY = 30;
+
+    /**
      * @var array
      */
     protected $configuration;
@@ -175,7 +183,7 @@ class MobilePay extends AbstractProvider
 
         $token = $parser->parse($data['id_token']);
 
-        $validator = new ValidationData($this->timestamp);
+        $validator = new ValidationData($this->timestamp, self::JWT_LEEWAY);
         $validator->setIssuer($this->configuration['issuer']);
         $validator->setAudience($this->clientId);
 
