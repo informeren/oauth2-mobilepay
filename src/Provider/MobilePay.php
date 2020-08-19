@@ -197,8 +197,10 @@ class MobilePay extends AbstractProvider
 
             $keyset = JWKSet::createFromJson($response->getBody());
 
-            if ($keyset->has($token->getHeader('kid'))) {
-                $key = $keyset->get($token->getHeader('kid'));
+            foreach($keyset as $index => $key) {
+                if ($key->get('kid') !== $token->getHeader('kid')) {
+                    continue;
+                }
 
                 $pem = KeyHelper::keyToPem($key);
 
